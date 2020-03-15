@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Image Classification</string>
+    <string-array name="device_entries" translatable="false">
+        <item>CPU</item>
+        <item>GPU</item>
+    </string-array>
+
+    <string-array name="thread_entries" translatable="false">
+        <item>4</item>
+        <item>16</item>
+        <item>32</item>
+        <item>64</item>
+        <item>128</item>
+    </string-array>
+
+    <string-array name="frame_entries" translatable="false">
+        <item>360p</item>
+        <item>720p</item>
+        <item>1080p</item>
+    </string-array>
+</resources>
