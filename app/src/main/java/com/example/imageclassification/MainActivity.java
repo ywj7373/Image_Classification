@@ -56,14 +56,28 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public static final String EXTRA_PROCESSOR = "com.example.imageclassification.EXTRA_PROCESSOR";
     public static final String EXTRA_FRAME = "com.example.imageclassification.EXTRA_FRAME";
     public static final String EXTRA_THREADS = "com.example.imageclassfication.EXTRA_THREADS";
+    public static final String EXTRA_FPS = "com.example.imageclassfication.EXTRA_FPS";
+    public static final String EXTRA_AUTOFOCUS = "com.example.imageclassfication.EXTRA_AUTOFOCUS";
+    public static final String EXTRA_AUTOEXPOSURE = "com.example.imageclassfication.EXTRA_AUTOEXPOSURE";
+    public static final String EXTRA_WHITEBALANCE = "com.example.imageclassfication.EXTRA_WHITEBALANCE";
 
     private ModifiedCameraView cameraBridgeViewBase;
     private TextView textViewObject;
+    private TextView textViewFPS;
     private BatteryManager bm;
 
-    private String frame = "360p";
+    private String frame = "1920 x 1080";
     private String processor = "CPU";
     private int numThreads = 4;
+    private String fps = "low";
+    private Boolean autoFocus = true;
+    private Boolean autoExposure =true;
+    private Boolean autoWhiteBalance = true;
+
+    private int counter = 0;
+    private int maxFrameCount = 30;
+    static int FPSCounter = 0;
+    private long fpsCaptureTime = 0;
 
     private Mat mRGBA;
     private Runnable postInferenceCallbackDNN;
@@ -98,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         textViewObject = findViewById(R.id.textView_object);
+        textViewFPS = findViewById(R.id.textView_fps);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //check for permissions
@@ -116,6 +131,30 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         frame = getIntent().getStringExtra(EXTRA_FRAME);
         processor = getIntent().getStringExtra(EXTRA_PROCESSOR);
         numThreads = getIntent().getIntExtra(EXTRA_THREADS, 4);
+        fps = getIntent().getStringExtra(EXTRA_FPS);
+        autoExposure = getIntent().getBooleanExtra(EXTRA_AUTOEXPOSURE, true);
+        autoFocus = getIntent().getBooleanExtra(EXTRA_AUTOFOCUS, true);
+        autoWhiteBalance = getIntent().getBooleanExtra(EXTRA_WHITEBALANCE, true);
+
+        Log.d(TAG, "AutoFocus: " + autoFocus);
+
+        switch (fps) {
+            case "low": {
+                maxFrameCount = 6;
+                break;
+            }
+            case "mid": {
+                maxFrameCount = 3;
+                break;
+            }
+            case "high": {
+                maxFrameCount = 0;
+                break;
+            }
+            default: {
+                maxFrameCount = 6;
+            }
+        }
 
         //callback
         postInferenceCallbackDNN =
@@ -156,17 +195,37 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
         cameraBridgeViewBase.enableView();
         cameraBridgeViewBase.enableFpsMeter();
-        List<Camera.Size> mResolutionList = cameraBridgeViewBase.getResolutionList();
-        for (Camera.Size resolution : mResolutionList) {
-            Log.d(TAG, "width: " + resolution.width + " height: " + resolution.height);
-        }
-        //switch ()
-        //cameraBridgeViewBase.setMaxFrameSize(640, 480);
     }
 
     @Override
     public void onCameraViewStarted(int width, int height) {
-        //mRGBA = new Mat(height, width, CvType.CV_8UC3);
+        if (!autoFocus) cameraBridgeViewBase.disableAutoFocus();
+        if (!autoExposure) cameraBridgeViewBase.disableAutoExposure();
+        if (!autoWhiteBalance) cameraBridgeViewBase.disableWhiteBalance();
+
+        switch (frame) {
+            case "1920 x 1080": {
+                cameraBridgeViewBase.setResolution(1920, 1080);
+                break;
+            }
+            case "1440 x 1080": {
+                cameraBridgeViewBase.setResolution(1440, 1080);
+                break;
+            }
+            case "1280 x 720": {
+                cameraBridgeViewBase.setResolution(1280, 720);
+                break;
+            }
+            case "960 x 540": {
+                cameraBridgeViewBase.setResolution(960, 540);
+                break;
+            }
+            case "320 x 240": {
+                cameraBridgeViewBase.setResolution(320, 240);
+                break;
+            }
+            default: cameraBridgeViewBase.setResolution(1920, 1080);
+        }
 
         classifier = new Classifier(this);
         isInferenceOngoing = true;
@@ -182,6 +241,29 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        // Control FPS
+        counter++;
+        if (counter < maxFrameCount)
+            return null;
+        counter = 0;
+
+        // Set FPS Text
+        long currentTime = SystemClock.uptimeMillis();
+        if ((currentTime - fpsCaptureTime) > 1000) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG,  "fps: " + FPSCounter);
+                    textViewFPS.setText(Integer.toString(FPSCounter));
+                    FPSCounter = 0;
+                }
+            });
+            fpsCaptureTime = currentTime;
+        }
+        else {
+            FPSCounter++;
+        }
+
         mRGBA = inputFrame.rgba();
 
         // If inference is not on going, start new inference
@@ -205,8 +287,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                         }
                     });
                     readyForNextInference();
-
-
                 }
             });
         }

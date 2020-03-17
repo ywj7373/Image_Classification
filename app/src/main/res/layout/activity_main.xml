@@ -28,4 +28,19 @@
         app:layout_constraintTop_toTopOf="@+id/camera_view"
         app:layout_constraintVertical_bias="0.852" />
 
+    <TextView
+        android:id="@+id/textView_fps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="fps"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:background="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.951"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/camera_view"
+        app:layout_constraintVertical_bias="0.053" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

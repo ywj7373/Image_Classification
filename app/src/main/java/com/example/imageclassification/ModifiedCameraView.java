@@ -15,26 +15,38 @@ public class ModifiedCameraView extends JavaCameraView {
         super(context, attrs);
     }
 
-    public void setPreviewFPS(double  min, double max){
-        Camera.Parameters params = mCamera.getParameters();
-        params.setPreviewFpsRange((int)(min*1000), (int)(max*1000));
-        //params.setPreviewFrameRate(min);
-        mCamera.setParameters(params);
-        // mCamera.getSupportedPreviewFpsRange();
-    }
 
     public List<Camera.Size> getResolutionList() {
         return mCamera.getParameters().getSupportedPreviewSizes();
     }
 
     public void setResolution(int width, int height) {
-        Camera.Parameters params = mCamera.getParameters();
-        params.setPreviewSize(mFrameWidth, mFrameHeight);
-        mCamera.setParameters(params);
+        disconnectCamera();
+        mMaxHeight = height;
+        mMaxWidth = width;
+        connectCamera(getWidth(), getHeight());
     }
 
     public Camera.Size getResolution() {
         return mCamera.getParameters().getPreviewSize();
+    }
+
+    public void disableAutoFocus() {
+        mCamera.cancelAutoFocus();
+    }
+
+    public void disableAutoExposure() {
+        Camera.Parameters parameters = mCamera.getParameters();
+        if (parameters.isAutoExposureLockSupported()) {
+            parameters.setAutoExposureLock(true);
+            mCamera.setParameters(parameters);
+        }
+    }
+
+    public void disableWhiteBalance() {
+        Camera.Parameters parameters = mCamera.getParameters();
+        parameters.setAutoWhiteBalanceLock(true);
+        mCamera.setParameters(parameters);
     }
 
 }

@@ -14,8 +14,17 @@
     </string-array>
 
     <string-array name="frame_entries" translatable="false">
-        <item>360p</item>
-        <item>720p</item>
-        <item>1080p</item>
+        <item>1920 x 1080</item>
+        <item>1440 x 1080</item>
+        <item>1280 x 720</item>
+        <item>960 x 540</item>
+        <item>720 x 480</item>
+        <item>320 x 240</item>
+    </string-array>
+
+    <string-array name="fps_entries" translatable="false">
+        <item>low</item>
+        <item>mid</item>
+        <item>high</item>
     </string-array>
 </resources>

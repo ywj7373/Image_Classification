@@ -5,25 +5,37 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class OptionActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener{
+public class OptionActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     private TextView textViewFrame;
     private TextView textViewDevice;
     private TextView textViewThreads;
+    private TextView textViewFps;
 
     private Spinner spinnerThreads;
     private Spinner spinnerDevice;
     private Spinner spinnerFrame;
+    private Spinner spinnerFps;
+
+    private Switch switchAutoFocus;
+    private Switch switchAutoExposure;
+    private Switch switchWhiteBalance;
 
     private Button buttonStart;
 
     private String device = "CPU";
     private int threads = 4;
-    private String frame = "360p";
+    private String frame = "1920 x 1080";
+    private String fps = "low";
+    private Boolean autoFocus = true;
+    private Boolean autoExposure =true;
+    private Boolean autoWhiteBalance = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,22 +45,58 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
         spinnerDevice = findViewById(R.id.spinner_device);
         spinnerThreads = findViewById(R.id.spinner_threads);
         spinnerFrame = findViewById(R.id.spinner_frame);
+        spinnerFps = findViewById(R.id.spinner_fps);
         textViewDevice = findViewById(R.id.textView_device);
         textViewFrame = findViewById(R.id.textView_frame);
         textViewThreads = findViewById(R.id.textView_threads);
+        textViewFps = findViewById(R.id.textView_fps);
         buttonStart = findViewById(R.id.button_start);
+        switchAutoExposure = findViewById(R.id.switch_autoExposure);
+        switchAutoFocus = findViewById(R.id.switch_autoFocus);
+        switchWhiteBalance = findViewById(R.id.switch_whiteBalance);
 
         spinnerDevice.setOnItemSelectedListener(this);
         spinnerFrame.setOnItemSelectedListener(this);
         spinnerThreads.setOnItemSelectedListener(this);
+        spinnerFps.setOnItemSelectedListener(this);
+
         buttonStart.setOnClickListener(this);
+
+        switchWhiteBalance.setChecked(true);
+        switchAutoFocus.setChecked(true);
+        switchAutoExposure.setChecked(true);
+
+        switchWhiteBalance.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) autoWhiteBalance = true;
+                else autoWhiteBalance = false;
+            }
+        });
+        switchAutoExposure.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) autoExposure = true;
+                else autoExposure = false;
+            }
+        });
+        switchAutoFocus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) autoFocus = true;
+                else autoFocus = false;
+            }
+        });
 
         device = spinnerDevice.getSelectedItem().toString();
         threads = Integer.parseInt(spinnerThreads.getSelectedItem().toString());
         frame = spinnerFrame.getSelectedItem().toString();
+        fps = spinnerFps.getSelectedItem().toString();
+
         textViewDevice.setText(device);
         textViewThreads.setText(Integer.toString(threads));
         textViewFrame.setText(frame);
+        textViewFps.setText(fps);
     }
 
     @Override
@@ -59,6 +107,10 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
                 intent.putExtra(MainActivity.EXTRA_FRAME, frame);
                 intent.putExtra(MainActivity.EXTRA_PROCESSOR, device);
                 intent.putExtra(MainActivity.EXTRA_THREADS, threads);
+                intent.putExtra(MainActivity.EXTRA_FPS, fps);
+                intent.putExtra(MainActivity.EXTRA_AUTOFOCUS, autoFocus);
+                intent.putExtra(MainActivity.EXTRA_AUTOEXPOSURE, autoExposure);
+                intent.putExtra(MainActivity.EXTRA_WHITEBALANCE, autoWhiteBalance);
                 startActivity(intent);
                 finish();
             }
@@ -78,6 +130,10 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
         else if (parent == spinnerFrame) {
             frame = parent.getItemAtPosition(position).toString();
             textViewFrame.setText(frame);
+        }
+        else if (parent == spinnerFps) {
+            fps = parent.getItemAtPosition(position).toString();
+            textViewFps.setText(fps);
         }
     }
 

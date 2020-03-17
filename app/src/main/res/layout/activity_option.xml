@@ -66,12 +66,53 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Fps Speed: "
+            android:textColor="@android:color/black" />
+        <Spinner
+            android:id="@+id/spinner_fps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentEnd="true"
+            android:entries="@array/fps_entries" />
+    </RelativeLayout>
+
+    <Switch
+        android:id="@+id/switch_autoFocus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Auto-focus"
+        android:layout_marginTop="10dp"/>
+
+    <Switch
+        android:id="@+id/switch_whiteBalance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="White Balance"
+        android:layout_marginTop="10dp"/>
+
+    <Switch
+        android:id="@+id/switch_autoExposure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Auto-exposure"
+        android:layout_marginTop="10dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/textView_device"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="device"
+            android:textColor="@android:color/black"
             android:textSize="20sp"
             android:layout_marginTop="10dp" />
 
@@ -80,6 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="threads"
+            android:textColor="@android:color/black"
             android:textSize="20sp"
             android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
@@ -90,10 +132,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="frame"
+            android:textColor="@android:color/black"
             android:textSize="20sp"
             android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
             android:layout_toEndOf="@id/textView_threads"/>
+
+        <TextView
+            android:id="@+id/textView_fps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="fps"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/textView_frame"/>
     </RelativeLayout>
 
     <Button
