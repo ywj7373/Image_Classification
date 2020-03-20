@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public static final String EXTRA_AUTOFOCUS = "com.example.imageclassfication.EXTRA_AUTOFOCUS";
     public static final String EXTRA_AUTOEXPOSURE = "com.example.imageclassfication.EXTRA_AUTOEXPOSURE";
     public static final String EXTRA_WHITEBALANCE = "com.example.imageclassfication.EXTRA_WHITEBALANCE";
+    public static final String EXTRA_ONLYCAMERA = "com.example.imageclassfication.EXTRA_ONLYCAMERA";
 
     private ModifiedCameraView cameraBridgeViewBase;
     private TextView textViewObject;
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private Boolean autoFocus = true;
     private Boolean autoExposure =true;
     private Boolean autoWhiteBalance = true;
+    private Boolean onlyCamera = false;
 
     private int counter = 0;
     private int maxFrameCount = 30;
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         autoExposure = getIntent().getBooleanExtra(EXTRA_AUTOEXPOSURE, true);
         autoFocus = getIntent().getBooleanExtra(EXTRA_AUTOFOCUS, true);
         autoWhiteBalance = getIntent().getBooleanExtra(EXTRA_WHITEBALANCE, true);
+        onlyCamera = getIntent().getBooleanExtra(EXTRA_ONLYCAMERA, false);
 
         Log.d(TAG, "AutoFocus: " + autoFocus);
 
@@ -227,16 +230,18 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             default: cameraBridgeViewBase.setResolution(1920, 1080);
         }
 
-        classifier = new Classifier(this);
-        isInferenceOngoing = true;
+        if (!onlyCamera) {
+            classifier = new Classifier(this);
+            isInferenceOngoing = true;
 
-        inferenceInBackground(new Runnable() {
-            @Override
-            public void run() {
-                classifier.initialize(processor, numThreads);
-                readyForNextInference();
-            }
-        });
+            inferenceInBackground(new Runnable() {
+                @Override
+                public void run() {
+                    classifier.initialize(processor, numThreads);
+                    readyForNextInference();
+                }
+            });
+        }
     }
 
     @Override
@@ -266,29 +271,31 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         mRGBA = inputFrame.rgba();
 
-        // If inference is not on going, start new inference
-        if (!isInferenceOngoing) {
-            isInferenceOngoing = true;
-            inferenceInBackground(new Runnable() {
-                @Override
-                public void run() {
-                    long startTime = SystemClock.uptimeMillis();
+        if (!onlyCamera) {
+            // If inference is not on going, start new inference
+            if (!isInferenceOngoing) {
+                isInferenceOngoing = true;
+                inferenceInBackground(new Runnable() {
+                    @Override
+                    public void run() {
+                        long startTime = SystemClock.uptimeMillis();
 
-                    Bitmap bitmap = toBitmap(mRGBA.clone());
-                    final String result = classifier.classify(bitmap);
+                        Bitmap bitmap = toBitmap(mRGBA.clone());
+                        final String result = classifier.classify(bitmap);
 
-                    long endTime = SystemClock.uptimeMillis();
-                    final long totalTime = endTime - startTime;
-                    Log.d("Time", "Total Time: " + totalTime);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            textViewObject.setText(result +" " +totalTime);
-                        }
-                    });
-                    readyForNextInference();
-                }
-            });
+                        long endTime = SystemClock.uptimeMillis();
+                        final long totalTime = endTime - startTime;
+                        Log.d("Time", "Total Time: " + totalTime);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textViewObject.setText(result + " " + totalTime);
+                            }
+                        });
+                        readyForNextInference();
+                    }
+                });
+            }
         }
 
         return mRGBA;

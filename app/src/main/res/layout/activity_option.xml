@@ -104,6 +104,14 @@
         android:text="Auto-exposure"
         android:layout_marginTop="10dp"/>
 
+    <Switch
+        android:id="@+id/switch_onlyCamera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Only Camera"
+        android:layout_marginTop="10dp"
+        android:checked="false"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

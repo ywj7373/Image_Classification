@@ -26,6 +26,7 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
     private Switch switchAutoFocus;
     private Switch switchAutoExposure;
     private Switch switchWhiteBalance;
+    private Switch switchOnlyCamera;
 
     private Button buttonStart;
 
@@ -34,8 +35,9 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
     private String frame = "1920 x 1080";
     private String fps = "low";
     private Boolean autoFocus = true;
-    private Boolean autoExposure =true;
+    private Boolean autoExposure = true;
     private Boolean autoWhiteBalance = true;
+    private Boolean onlyCamera = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,7 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
         switchAutoExposure = findViewById(R.id.switch_autoExposure);
         switchAutoFocus = findViewById(R.id.switch_autoFocus);
         switchWhiteBalance = findViewById(R.id.switch_whiteBalance);
+        switchOnlyCamera = findViewById(R.id.switch_onlyCamera);
 
         spinnerDevice.setOnItemSelectedListener(this);
         spinnerFrame.setOnItemSelectedListener(this);
@@ -65,6 +68,7 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
         switchWhiteBalance.setChecked(true);
         switchAutoFocus.setChecked(true);
         switchAutoExposure.setChecked(true);
+        switchOnlyCamera.setChecked(false);
 
         switchWhiteBalance.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -85,6 +89,13 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) autoFocus = true;
                 else autoFocus = false;
+            }
+        });
+        switchOnlyCamera.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) onlyCamera = true;
+                else onlyCamera = false;
             }
         });
 
@@ -111,6 +122,7 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
                 intent.putExtra(MainActivity.EXTRA_AUTOFOCUS, autoFocus);
                 intent.putExtra(MainActivity.EXTRA_AUTOEXPOSURE, autoExposure);
                 intent.putExtra(MainActivity.EXTRA_WHITEBALANCE, autoWhiteBalance);
+                intent.putExtra(MainActivity.EXTRA_ONLYCAMERA, onlyCamera);
                 startActivity(intent);
                 finish();
             }
